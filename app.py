@@ -3,9 +3,11 @@ import pandas as pd
 import plotly.express as px
 from sqlalchemy import create_engine,text
 
+
 engine = create_engine(
-    "mysql+pymysql://root:Athul%401335@localhost/food_wastage_management"
+    f"mysql+pymysql://{st.secrets['MYSQLUSER']}:{st.secrets['MYSQLPASSWORD']}@{st.secrets['MYSQLHOST']}:{st.secrets['MYSQLPORT']}/{st.secrets['MYSQLDATABASE']}"
 )
+
 
 providers = pd.read_sql("SELECT * FROM providers", engine)
 receivers = pd.read_sql("SELECT * FROM receivers", engine)
@@ -319,6 +321,12 @@ elif page == "CRUD Operations":
                 conn.execute(text(query))
 
             st.success("Food Added Successfully")
+            st.subheader("Latest Food Records")
+            food_check=pd.read_sql(
+                "SELECT * FROM food_listings ORDER BY Food_ID DESC LIMIT 10",
+                engine
+            )
+            st.dataframe(food_check)
 
     # UPDATE
     elif operation == "Update Food Quantity":
